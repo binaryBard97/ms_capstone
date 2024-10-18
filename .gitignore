@@ -5,3 +5,4 @@
 phase-1/workloads/redis/*txt
 phase-1/workloads/redis/buildroot
 /.vscode
+.DS_Store
