@@ -1,0 +1,84 @@
+minikube start --driver=docker --container-runtime=cri-o --extra-config=kubelet.feature-gates=ContainerCheckpoint=true
+minikube start --driver=hyperkit --container-runtime=cri-o  --extra-config=kubelet.feature-gates=ContainerCheckpoint=true --base-image=ubuntu:20.04
+
+minikube start --driver=vfkit --container-runtime=cri-o  --extra-config=kubelet.feature-gates=ContainerCheckpoint=true --iso-url=https://storage.googleapis.com/minikube/iso/minikube-v1.34.0.iso
+
+kubectl apply -f redis-pod.yaml
+kubectl get pods -n default
+
+
+ssh -- sudo cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+cd /var/lib/kubelet/
+vi kubeadm-flags.env
+--feature-gates=ContainerCheckpoint=true
+--anonymous-auth=true
+sudo systemctl daemon-reload && sudo systemctl restart kubelet
+
+cd /etc/crio/
+vi crio.conf 
+enable_criu_support = true
+sudo systemctl restart crio
+
+sudo systemctl status crio
+sudo systemctl status kubelet
+
+curl -X  POST "http://localhost:10250/checkpoint/default/redis-p/redis-c" \
+     --insecure \
+     --cert /Users/shreyasimac/.minikube/profiles/minikube/client.crt \
+     --key  /Users/shreyasimac/.minikube/profiles/minikube/client.key 
+
+/var/lib/minikube/certs
+
+curl -sk -X POST  "https://localhost:10250/checkpoint/default/webserver/webserver" \
+  --key /etc/kubernetes/pki/apiserver-kubelet-client.key \
+  --cacert /etc/kubernetes/pki/ca.crt \
+  --cert /etc/kubernetes/pki/apiserver-kubelet-client.crt
+
+curl -k -X POST  "https://localhost:10250/checkpoint/default/redis-p/redis-c" \
+  --key /var/lib/minikube/certs/apiserver-kubelet-client.key \
+  --cacert /var/lib/minikube/certs/ca.crt \
+  --cert /var/lib/minikube/certs/apiserver-kubelet-client.crt
+
+
+curl -k https://localhost:10250/pods \
+  --cert /var/lib/minikube/certs/apiserver-kubelet-client.crt \
+  --key /var/lib/minikube/certs/apiserver-kubelet-client.key \
+  --cacert /var/lib/minikube/certs/ca.crt
+
+curl -k http://localhost:10250/redis-p/re \
+  --cert /var/lib/minikube/certs/apiserver-kubelet-client.crt \
+  --key /var/lib/minikube/certs/apiserver-kubelet-client.key \
+  --cacert /var/lib/minikube/certs/ca.crt
+
+curl -X -k POST "https://localhost:10250/checkpoint/default/redis-p/redis-c" \
+--insecure --cert /var/lib/kubelet/pki/kubelet.crt --key /var/lib/kubelet/pki/kubelet.key
+
+curl -X POST "https://localhost:10250/checkpoint/default/redis-p/redis-c" \
+--insecure --cert /home/kubelet-client.crt --key /home/kubelet-client.key
+
+
+
+curl -skv -X  GET "http://localhost:10250/pods \
+     --insecure \
+     --cert /Users/shreyasimac/.minikube/profiles/minikube/client.crt \
+     --key  /Users/shreyasimac/.minikube/profiles/minikube/client.key 
+
+curl -skv -X GET  "https://localhost:10250/pods" \
+  --key kubeadm init/apiserver-kubelet-client.key \
+  --cacert /etc/kubernetes/pki/ca.crt \
+  --cert /etc/kubernetes/pki/apiserver-kubelet-client.crt
+
+
+     more /etc/apt/sources.list.d/devel\:kubic\:libcontainers\:stable\:cri-o\:1.18.list 
+deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_20.04/ /
+
+curl -sk -X POST  "https://localhost:10250/checkpoint/default/webserver/webserver" \
+  --key /etc/kubernetes/pki/apiserver-kubelet-client.key \
+  --cacert /etc/kubernetes/pki/ca.crt \
+  --cert /etc/kubernetes/pki/apiserver-kubelet-client.crt
+
+
+  minikube ssh -- sudo cat /var/lib/minikube/certs/ca.crt > client-ca.crt
+minikube ssh -- sudo cat /var/lib/minikube/certs/apiserver-client.crt > client-admin.crt
+minikube ssh -- sudo cat /var/lib/minikube/certs/apiserver-client.key > client-admin.key

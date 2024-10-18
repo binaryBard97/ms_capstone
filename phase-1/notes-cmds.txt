@@ -1,0 +1,35 @@
+alias k=kubectl     
+alias mk=minikube   
+alias d="minikube delete --all --purge"
+alias s="minikube stop"
+
+
+minikube start 
+
+                       
+
+k apply -f priorityclass.yaml
+
+k apply -f low-priority-pod-v2.yaml
+
+k get pods -w
+
+k exec -it low-priority-pod -- tail -f /usr/share/nginx/html/data.txt
+
+k apply -f high-priority-pod.yaml
+
+k get pods -w
+
+k apply -f low-priority-pod-v2.yaml
+
+kubectl exec -it stateful-pod -- cat /usr/share/nginx/html/data.txt
+
+k get pods -w
+
+
+
+
+
+Sep 22 14:09:51 minikube kubelet[1001]: E0922 14:09:51.352237    1001 run.go:72] "command failed" err="failed to load kubelet config file, path: /var/lib/kubelet/config.yaml, error: failed to load Kubelet config file /var/lib/kubelet/config.yaml, error failed to read kubelet config file \"/var/lib/kubelet/config.yaml\", error: open /var/lib/kubelet/config.yaml: no such file or directory"
+Sep 22 14:09:51 minikube systemd[1]: kubelet.service: Main process exited, code=exited, status=1/FAILURE
+Sep 22 14:09:51 minikube systemd[1]: kubelet.service: Failed with result 'exit-code'.

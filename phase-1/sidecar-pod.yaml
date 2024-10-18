@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-pod
+  namespace: default
+spec:
+  containers:
+    - name: checkpoint-sidecar
+      image: docker.io/spdocker81/criu-ubuntu:latest
+      imagePullPolicy: IfNotPresent

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: checkpoint-manager-pod
+spec:
+  serviceAccountName: my-service-account
+  containers:
+    - name: sidecar-container
+      image: docker.io/spdocker81/bar
+      volumeMounts:
+        - mountPath: /checkpoint-manager
+          name: example-volume
+      command: ["tail", "-f", "/dev/null"]
+      securityContext:
+        capabilities:
+          add: ["CAP_NET_RAW"]
+    - name: redis
+      image: docker.io/redis
+      ports:
+        - containerPort: 6379
+  volumes:
+    - name: example-volume
+      hostPath:
+        path: /checkpoint-manager
+        type: ""
+  hostNetwork: true

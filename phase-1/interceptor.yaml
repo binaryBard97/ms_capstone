@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interceptor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: interceptor
+  template:
+    metadata:
+      labels:
+        app: interceptor
+    spec:
+      containers:
+        - name: interceptor
+          image: docker.io/spdocker81/interceptor:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: HOST
+              value: "kv-store:5000"
+            - name: PORT
+              value: "3000"
+            - name: LOG_PATH
+              value: "/app/logs/log.txt"
+            - name: CR_LOGGING_PATH
+              value: "/app/logs_CR/CR_log.txt"

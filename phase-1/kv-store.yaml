@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kv-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kv-store
+  template:
+    metadata:
+      labels:
+        app: kv-store
+    spec:
+      containers:
+        - name: kv-store
+          image: docker.io/redis
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: ":5000"

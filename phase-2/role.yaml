@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole # luster-scoped
+metadata:
+  name: access-checkpoint-role
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["nodes/checkpoint"]
+    verbs: ["create", "update", "get", "list"]
