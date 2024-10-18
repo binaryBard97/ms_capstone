@@ -1,0 +1,5 @@
+phase-1/workloads/redis/buildroot
+*.vscode
+*.DS_Store
+*.txt
+
